@@ -1,10 +1,10 @@
 from dispatcher import bot
+from dispatcher import dp
 import requests
 from config import open_weather_token
 from config import CHAT_ID
 from config import ADMIN_ID
 from aiogram import Bot, types,executor,Dispatcher
-from dbx import Database
 import datetime
 import json
 from aiogram.utils.markdown import hbold, hunderline, hcode, hlink
@@ -148,15 +148,7 @@ async def start(message: types.Message):
                     if not message.reply_to_message.from_user.id == 1356559037:
                         if not message.reply_to_message.from_user.id == 837817771:
                                     if not message.from_user.id == 837817771:
-                                       admins_list = [admin.user.id for admin in await bot.get_chat_administrators(chat_id=message.chat.id)]
-                                       for adm_id in admins_list:
-                                         try:
-                                           await bot.send_message(text=f"🆘Жалоба в чате\nПользователь <code>{message.from_user.full_name}</code> [<code>{message.from_user.user.id}</code>] @{message.from_user.username} отправил жалобу на <code>{message.reply_to_message.from_user.username}</code> [<code>{message.reply_to_message.from_user.id}</code>]",
-                                           chat_id=adm_id, parse_mode=types.ParseMode.MARKDOWN,
-                                           disable_web_page_preview=True)
-                                         except:
-                                           pass
-    await message.reply(f"Жалоба на пользователя @{message.reply_to_message.from_user.username}\nОтправлено админам!")
+                                       await message.reply(f"Жалоба на пользователя @{message.reply_to_message.from_user.username}\nОтправлено админам")
     if message.reply_to_message.from_user.id == message.from_user.id:
         await message.reply("Нельзя репортить самого себя 🤪")
     if message.reply_to_message.from_user.id == 5394425690:
@@ -691,10 +683,6 @@ async def filter_mes(message: types.Message):
             if word in message.text.lower():
                 await message.delete()
                 await message.answer(f"Пользователь @{message.from_user.username} нарушив правила чата и написав мат в чате.\nОтправлено админам.")
-    if not dbx.user_exists(message.from_user.id):
-        dbx.add_user(message.from_user.id)
-    if not dbx.mute(message.from_user.id):
-        print("/")    
     code_to_smile = {
         "Clear": "Ясно \U00002600",
         "Clouds": "Облачно \U00002601",
