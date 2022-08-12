@@ -1,6 +1,6 @@
-BOT_TOKEN="5394425690:AAH6HjPiOckIEa9X93-Tx2dxYXT_EjEFeU0"
+BOT_TOKEN="bot token"
 
-open_weather_token = "d6d0e038aa00191569176dc27414ac24"
+open_weather_token = "open weather token"
 
 ADMIN_ID = "837817771"
 
