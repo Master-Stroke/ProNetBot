@@ -148,7 +148,15 @@ async def start(message: types.Message):
                     if not message.reply_to_message.from_user.id == 1356559037:
                         if not message.reply_to_message.from_user.id == 837817771:
                                     if not message.from_user.id == 837817771:
-                                       await message.reply(f"Жалоба на пользователя @{message.reply_to_message.from_user.username}\nОтправлено админам")
+                                       admins_list = [admin.user.id for admin in await bot.get_chat_administrators(chat_id=message.chat.id)]
+                                       for adm_id in admins_list:
+                                         try:
+                                           await bot.send_message(text=f"🆘Жалоба в чате\nПользователь <code>{message.from_user.full_name}</code> [<code>{message.from_user.user.id}</code>] @{message.from_user.username} отправил жалобу на <code>{message.reply_to_message.from_user.username}</code> [<code>{message.reply_to_message.from_user.id}</code>]",
+                                           chat_id=adm_id, parse_mode=types.ParseMode.MARKDOWN,
+                                           disable_web_page_preview=True)
+                                         except:
+                                           pass
+    await message.reply(f"Жалоба на пользователя @{message.reply_to_message.from_user.username}\nОтправлено админам!")
     if message.reply_to_message.from_user.id == message.from_user.id:
         await message.reply("Нельзя репортить самого себя 🤪")
     if message.reply_to_message.from_user.id == 5394425690:
