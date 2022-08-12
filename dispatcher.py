@@ -11,7 +11,7 @@ if not config.BOT_TOKEN:
     exit("No token provided")
 
 # init
-bot = Bot(token=config.BOT_TOKEN, parse_mode='HTML')
+bot = Bot(token=config.BOT_TOKEN, parse_mode=types.ParseMode.HTML)
 dp = Dispatcher(bot)
 
 # activate filters
