@@ -1,0 +1,9 @@
+aiogram
+asyncio
+datetime
+utils
+psutil
+bs4
+requests
+sql
+lxml
