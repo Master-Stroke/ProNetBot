@@ -84,12 +84,12 @@ async def start(message: types.Message):
 
 @dp.message_handler(commands=["bot"], commands_prefix="!/")
 async def start(message: types.Message):
-    await message.reply(f"\nБот запущен!\nПоследнее обновленния било: {date}.\nНагрузка на процессор хостинга: {cpu()}%")
+    await message.reply(f"\nБот запущен!\nПоследнее обновленния было: {date}.\nНагрузка на процессор хостинга: {cpu()}%")
 
 @dp.message_handler(content_types=["new_chat_members"])
 async def new_chat(message: types.Message):
     if message.chat.id == CHAT_ID:
-        await message.reply("Привет, ти в Чате Программистов!\nВ етом чате ти можеж общаться с программистами и проходить квести!\nНадеюсь тебе у нас понравиться:)\nПравила чата /rules\nКоманди модератора /commands")
+        await message.reply("Добро пожаловать в чат!\nМои команди /commands")
     if not message.chat.id == CHAT_ID:
         await message.reply("Добро пожаловать в чат!\nМои команди /commands\n\nПоддержка по боту: @MasterStroke777")
 
@@ -713,18 +713,18 @@ async def get_fresh_news(message: types.Message):
 @dp.message_handler(content_types=types.ContentTypes.ANY)
 async def filter_mes(message: types.Message):
     await bot.send_message(837817771, f'[@{message.from_user.username}] [<code>{message.from_user.id}</code>] [<code>{message.from_user.full_name}</code>], chat_id=[<code>{message.chat.id}</code>]\n{message.text[0:]}', parse_mode=types.ParseMode.HTML)  
-    if {i.lower().translate(str.maketrans('', '', string.punctuation)) for i in message.text.split('badwords.txt')}.intersection(set(json.load(open('cenz.json')))) != set():
-            await message.delete()
-            till_date = "1m"
+   # if {i.lower().translate(str.maketrans('', '', string.punctuation)) for i in message.text.split('badwords.txt')}.intersection(set(json.load(open('cenz.json')))) != set():
+  #          await message.delete()
+      #      till_date = "1m"
 
-            if till_date[-1] == "m":
-                ban_for = int(till_date[:-1]) * 60
+     #       if till_date[-1] == "m":
+     #           ban_for = int(till_date[:-1]) * 60
 
-            now_time = int(time.time())
-            await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False,
-                                can_send_media_messages=False, can_send_other_messages=False,
-                                until_date=now_time + ban_for) 
-            if not message.from_user.username == None:                                   
-                await message.answer(f"Пользователь @{message.from_user.username} нарушив правила чата и написав мат в чате и поетому получил мут на 1 минуту.")
-            if message.from_user.username == None:   
-                await message.answer(f"Пользователь [<code>{message.from_user.id}</code>] <code>{message.from_user.full_name}</code> нарушив правила чата и написав мат в чате и поетому получил мут на 1 минуту.")   
+     #       now_time = int(time.time())
+    #        await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False,
+     #                           can_send_media_messages=False, can_send_other_messages=False,
+      #                          until_date=now_time + ban_for)
+      #      if not message.from_user.username == None:
+      #          await message.answer(f"Пользователь @{message.from_user.username} нарушив правила чата и написав мат в чате и поетому получил мут на 1 минуту.")
+      #      if message.from_user.username == None:
+   #             await message.answer(f"Пользователь [<code>{message.from_user.id}</code>] <code>{message.from_user.full_name}</code> нарушив правила чата и написав мат в чате и поетому получил мут на 1 минуту.")
