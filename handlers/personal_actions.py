@@ -15,6 +15,7 @@ from aiogram import types
 from aiogram.dispatcher.filters import AdminFilter, IsReplyFilter
 from random import randint
 import string
+import utils
 
 Year = int(datetime.datetime.now().strftime("%Y"))
 Mounth = datetime.datetime.now().strftime("%B")
@@ -128,145 +129,56 @@ async def start(message: types.Message):
 #    await message.answer("Участники чата, не забывайте про команду /report с помощю которой Вы можете обратить внимание администрации на нарушителя в чате")
 
 # ban user
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=True), commands=['ban'],
-                    commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
-async def ban(message: types.Message):
-    replied_user = message.reply_to_message.from_user.id
-    admin_id = message.from_user.id
-    await bot.ban_chat_member(chat_id=message.chat.id, user_id=replied_user)    
-    if not message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователю @{message.reply_to_message.from_user.username} видан бан!\nПричина: {message.text[5:]}")   
-    if message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователю [<code>{message.from_user.id}</code>] <code>{message.from_user.full_name}</code> видан бан!\nПричина: {message.text[5:]}")
+@dp.message_handler(is_chat_admin=True, commands=['ban'], commands_prefix="!/")
+async def cmd_ban(message: types.Message):
+    if not message.reply_to_message:
+        await message.reply("Эта команда должна быть ответом на сообщение")
+        return
 
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=False), commands=['ban'],
-                    commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
-async def ban(message: types.Message):
-    await message.reply("Команда должна бить ответом на собщенния!")    
-                            
+    user = await message.bot.get_chat_member(message.chat.id,
+                                             message.reply_to_message.from_user.id)
 
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=True), commands=['unban'],
-                    commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
-async def ban(message: types.Message):
-    replied_user = message.reply_to_message.from_user.id
-    admin_id = message.from_user.id
-    await bot.unban_chat_member(chat_id=message.chat.id, user_id=replied_user)
-    if not message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователь @{message.reply_to_message.from_user.username} разбанен!\nПричина: {message.text[7:]}")   
-    if message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователь [<code>{message.from_user.id}</code>] <code>{message.from_user.full_name}</code> разбанен\nПричина: {message.text[7:]}")
+    if message.reply_to_message.from_user.id == message.from_user.id:
+        await message.reply("Нельзя забанить самого себя =)")
+        return
 
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=False), commands=['unban'],
-                    commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
-async def ban(message: types.Message):
-    await message.reply("Команда должна бить ответом на собщенния!")                                                         
+    if user.is_chat_admin():
+        await message.reply("Нельзя изменять права администраторов!")
+        return
 
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=True), commands=['kick'],
-                    commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
-async def ban(message: types.Message):
-    replied_user = message.reply_to_message.from_user.id
-    admin_id = message.from_user.id
-    await bot.kick_chat_member(chat_id=message.chat.id, user_id=replied_user)
-    if not message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователь @{message.reply_to_message.from_user.username} кикнет с чата!\nПричина: {message.text[6:]}")   
-    if message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователь [<code>{message.from_user.id}</code>] <code>{message.from_user.full_name}</code> кикнет с чата\nПричина: {message.text[6:]}")
-
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=False), commands=['kick'],
-                    commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
-async def ban(message: types.Message):
-    await message.reply("Команда должна бить ответом на собщенния!")          
-
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=True), commands=['unkick'],
-                    commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
-async def ban(message: types.Message):
-    replied_user = message.reply_to_message.from_user.id
-    admin_id = message.from_user.id
-    await bot.ban_chat_member(chat_id=message.chat.id, user_id=replied_user)
-    if not message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователь @{message.reply_to_message.from_user.username} разкикнет!\nПричина: {message.text[8:]}")   
-    if message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователь [<code>{message.from_user.id}</code>] <code>{message.from_user.full_name}</code> разкикнет\nПричина: {message.text[8:]}")
-
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=False), commands=['unkick'],
-                    commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
-async def ban(message: types.Message):
-    await message.reply("Команда должна бить ответом на собщенния!")        
-
-# mute user in chat
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=True), commands=['mute'],
-                    commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
-async def mute(message: types.Message):
-    await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.reply_to_message.from_user.id)
-    if not message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователю @{message.reply_to_message.from_user.username} видан мут на всегда!\nПричина: {message.text[6:]}")   
-    if message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователю [<code>{message.from_user.id}</code>] <code>{message.from_user.full_name}</code> видан мут на всегда!\nПричина: {message.text[6:]}")
-
-# mute user in chat
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=True), commands=['tmute'],
-                    commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
-async def mute(message: types.Message):
-    args = message.get_args()
-    if args:
-        till_date = message.text.split()[1]
+    user = message.reply_to_message.from_user
+    if user.last_name is not None:
+        await message.reply(f"Пользователь {user.first_name} {user.last_name} (@{user.username}) забанен навсегда!")
     else:
-        till_date = "365d"
+        await message.reply(f"Пользователь {user.first_name} (@{user.username}) забанен навсегда!")
+    await message.bot.delete_message(message.chat.id, message.message_id)  # remove admin message
+    await message.bot.kick_chat_member(chat_id=message.chat.id,
+                                       user_id=message.reply_to_message.from_user.id
+                                       )
 
-    if till_date[-1] == "m":
-        ban_for = int(till_date[:-1]) * 60
-        say = "минут"
-        on = " на"
-        if ban_for == "60":
-            say = "минуту"
-        if ban_for == "120":
-            say = "минути"
-        if ban_for == "180":
-            say = "минути"
-        if ban_for == "240":
-            say = "минути"                                    
-    elif till_date[-1] == "h":
-        ban_for = int(till_date[:-1]) * 3600
-        say = "часов"
-        on = " на"
-        if ban_for == "60":
-            say = "час"
-        if ban_for == "120":
-            say = "часа"
-        if ban_for == "180":
-            say = "часа"
-        if ban_for == "240":
-            say = "часа"     
-    elif till_date[-1] == "d":
-        ban_for = int(till_date[:-1]) * 86400
-        say = "дней"
-        on = " на"
-        if ban_for == "60":
-            say = "день"
-        if ban_for == "120":
-            say = "дня"
-        if ban_for == "180":
-            say = "дня"
-        if ban_for == "240":
-            say = "дня"       
+
+@dp.message_handler(is_chat_admin=True, commands=["unban"], commands_prefix="!/")
+async def cmd_unban(message: types.Message):
+    # Check if command is sent as reply to some message
+    if not message.reply_to_message:
+        await message.reply("Эта команда должна быть ответом на сообщение")
+        return
+
+    user = await message.bot.get_chat_member(message.chat.id,
+                                             message.reply_to_message.from_user.id
+                                             )
+    if user.is_chat_admin():
+        await message.reply("Нельзя изменять права администраторов")
+        return
+
+    user = message.reply_to_message.from_user
+    if user.last_name is not None:
+        await message.reply(f"Пользователь {user.first_name} {user.last_name} (@{user.username}) разбанен")
     else:
-        ban_for = 31622400
-
-    replied_user = message.reply_to_message.from_user.id
-    now_time = int(time.time())
-    await bot.restrict_chat_member(chat_id=message.chat.id, user_id=replied_user, can_send_messages=False,
-                                   can_send_media_messages=False, can_send_other_messages=False,
-                                   until_date=now_time + ban_for)
-    try:
-    #   why = message.text.split()                          
-       await message.reply(text=f"Пользователю @{message.reply_to_message.from_user.username} видан мут{on} {till_date[:1]} {say}\nПричина: {why}")
-    except:                      
-       await message.reply(text=f"Пользователю @{message.reply_to_message.from_user.username} видан мут{on} {till_date[:1]} {say}")       
-
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=False), commands=['tmute'],
-                    commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
-async def ban(message: types.Message):
-    await message.reply("Команда должна бить ответом на собщенния!")       
+        await message.reply(f"Пользователь {user.first_name} (@{user.username}) разбанен")
+    await message.bot.delete_message(message.chat.id, message.message_id)  # remove admin message
+    await message.bot.unban_chat_member(chat_id=message.chat.id,
+                                        user_id=message.reply_to_message.from_user.id)
 
 # random mute chat member
 @dp.message_handler(chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP], commands=['dont_click_me'],
@@ -279,27 +191,82 @@ async def mute_random(message: types.Message):
     await bot.restrict_chat_member(chat_id=message.chat.id, user_id=replied_user_id, can_send_messages=False,
                                    can_send_media_messages=False, can_send_other_messages=False,
                                    until_date=now_time + 60 * random_m)
-    if not message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователю @{message.reply_to_message.from_user.username} видан мут на рандомное число {random_m}.")   
-    if message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователю [<code>{message.from_user.id}</code>] <code>{message.from_user.full_name}</code> видан мут на рандомное число {random_m}.")
+    if not message.from_user.username == None:
+        await message.reply(f"Пользователю @{message.reply_to_message.from_user.username} видан мут на рандомное число, {random_m} минут.")
+    if message.from_user.username == None:
+        await message.reply(f"Пользователю [<code>{message.from_user.id}</code>] <code>{message.from_user.full_name}</code> видан мут на рандомное число, {random_m} минут.")
 
 # unmute user in chat
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=True), commands_prefix='!/',
-                    chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP], commands=['unmute'])
-async def unmute(message: types.Message):
-    replied_user = message.reply_to_message.from_user.id
-    await bot.restrict_chat_member(chat_id=message.chat.id, user_id=replied_user, can_send_messages=True,
-                                   can_send_media_messages=True, can_send_other_messages=True)
-    if not message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователь @{message.reply_to_message.from_user.username} размучен!\nПричина: {message.text[8:]}")   
-    if message.reply_to_message.from_user.username == None:
-        await message.reply(f"Пользователь [<code>{message.from_user.id}</code>] <code>{message.from_user.full_name}</code> размучен\nПричина: {message.text[8:]}")
+@dp.message_handler(is_chat_admin=True, commands="mute", commands_prefix="!/")
+async def cmd_readonly(message: types.Message):
+    # Check if command is sent as reply to some message
+    if not message.reply_to_message:
+        await message.reply("Эта команда должна быть ответом на сообщение")
+        return
 
-@dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=False), commands=['unmute'],
-                    commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
-async def ban(message: types.Message):
-    await message.reply("Команда должна бить ответом на собщенния!")                                                                                   
+    # Admins cannot be restricted
+    user = await message.bot.get_chat_member(message.chat.id,
+                                             message.reply_to_message.from_user.id
+                                             )
+    if user.is_chat_admin():
+        await message.reply("Нельзя изменять права администраторов")
+        return
+
+    words = message.text.split()
+    if len(words) > 1:  # !mute with arg
+        restriction_time = utils.get_restriction_time(words[1])
+        if not restriction_time:
+            await message.reply(
+                "Неправильный формат времени!\nИспользуйте число + символ m, h или d.\nНапример: <code>!mute 7d</code>"
+            )
+            return
+    else:
+        restriction_time = 86400 * 367
+
+    now_time = int(time.time())
+
+    await message.bot.restrict_chat_member(message.chat.id,
+                                           message.reply_to_message.from_user.id,
+                                           types.ChatPermissions(),
+                                           until_date=now_time + restriction_time
+                                           )
+
+    user = message.reply_to_message.from_user
+    if len(words) > 1:
+            await message.reply(f"Пользователю {user.full_name} (@{user.username}) выдан мут на " + (
+                "{restriction_time}").format(restriction_time=words[1]))
+    else:
+            await message.reply(
+                f"Пользователю {user.full_name} (@{user.username}) выдан мут навсегда")
+
+
+@dp.message_handler(is_chat_admin=True, commands="unmute", commands_prefix="!/")
+async def cmd_unreadonly(message: types.Message):
+    # Check if command is sent as reply to some message
+    if not message.reply_to_message:
+        await message.reply("Эта команда должна быть ответом на сообщение")
+        return
+
+    user = await message.bot.get_chat_member(message.chat.id, message.reply_to_message.from_user.id)
+    if user.is_chat_admin():
+        await message.reply("Нельзя изменять права администраторов!")
+        return
+
+    await message.bot.restrict_chat_member(message.chat.id,
+                                           message.reply_to_message.from_user.id,
+                                           types.ChatPermissions(
+                                               can_send_messages=True,
+                                               can_send_media_messages=True,
+                                               can_send_polls=True,
+                                               can_send_other_messages=True,
+                                               can_add_web_page_previews=True,
+                                               can_change_info=True,
+                                               can_invite_users=True,
+                                               can_pin_messages=True)
+                                           )
+
+    user = message.reply_to_message.from_user
+    await message.reply(f"Пользователь {user.full_name} (@{user.username}) размучен")
 
 # pin chat message
 @dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=True),
@@ -311,7 +278,7 @@ async def pin_message(message: types.Message):
 @dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=False), commands=['pin'],
                     commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
 async def ban(message: types.Message):
-    await message.reply("Команда должна бить ответом на собщенния!")               
+    await message.reply("Команда должна быть ответом на собщенния!")
 
 # unpin chat message
 @dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=True), commands_prefix='!/',
@@ -323,7 +290,7 @@ async def unpin_message(message: types.Message):
 @dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=False), commands=['unpin'],
                     commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
 async def ban(message: types.Message):
-    await message.reply("Команда должна бить ответом на собщенния!")          
+    await message.reply("Команда должна бить ответом на собщенния!")
 
 # delete user message
 @dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=True), commands_prefix='!/',
@@ -336,7 +303,7 @@ async def delete_message(message: types.Message):
 @dp.message_handler(AdminFilter(is_chat_admin=True), IsReplyFilter(is_reply=False), commands=['del'],
                     commands_prefix='!/', chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP])
 async def ban(message: types.Message):
-    await message.reply("Команда должна бить ответом на собщенния!")    
+    await message.reply("Команда должна быть ответом на собщенния!")
 # get chat admins list
 @dp.message_handler(chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP], commands=['admins'],
                     commands_prefix='!/')
@@ -350,7 +317,6 @@ async def get_admin_list(message: types.Message):
     for admins in admins_list:
         result_list += "".join(admins) + '\n'
     await message.reply("Админи чата:\n" + result_list, parse_mode=types.ParseMode.MARKDOWN)
-
 
 # report about spam or something else
 @dp.message_handler(chat_type=[types.ChatType.SUPERGROUP, types.ChatType.GROUP], commands=['report'],
